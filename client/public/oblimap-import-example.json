@@ -1,0 +1,229 @@
+{
+  "_note": "Oblimap import template (same format as an export). Fill in the sections you need and delete the rest. UUIDs are optional: omit them to always create new records; when a UUID matches an existing record, the conflict strategy chosen at import time decides whether to update it, ignore it or create a copy. References between sections (parentUuid, groupUuid, scopeUuid) use these UUIDs. Every value below is a fake example.",
+  "version": 1,
+  "sections": [
+    "siteGroups", "sites", "settings", "notificationChannels", "teams",
+    "siteSubnets", "reservations", "siteItems", "vendorRules", "macVendorOverrides", "permissionSets"
+  ],
+
+  "siteGroups": [
+    {
+      "_note": "A top-level group. parentUuid null = root group.",
+      "uuid": "aaaaaaaa-0000-4000-8000-000000000001",
+      "name": "Example Company",
+      "description": "Top-level group (example)",
+      "parentUuid": null,
+      "sortOrder": 0,
+      "isGeneral": false,
+      "groupNotifications": false
+    },
+    {
+      "_note": "A sub-group: parentUuid points at the group above.",
+      "uuid": "aaaaaaaa-0000-4000-8000-000000000002",
+      "name": "Example Branch Offices",
+      "description": "Sub-group (example)",
+      "parentUuid": "aaaaaaaa-0000-4000-8000-000000000001",
+      "sortOrder": 0,
+      "isGeneral": false,
+      "groupNotifications": false
+    }
+  ],
+
+  "sites": [
+    {
+      "_note": "A site in the top-level group.",
+      "uuid": "bbbbbbbb-0000-4000-8000-000000000001",
+      "name": "Example Head Office",
+      "description": "Main LAN (example)",
+      "groupUuid": "aaaaaaaa-0000-4000-8000-000000000001"
+    },
+    {
+      "_note": "A site in the sub-group.",
+      "uuid": "bbbbbbbb-0000-4000-8000-000000000002",
+      "name": "Example Branch 1",
+      "description": "Branch LAN (example)",
+      "groupUuid": "aaaaaaaa-0000-4000-8000-000000000002"
+    }
+  ],
+
+  "settings": [
+    {
+      "_note": "Global (tenant-wide) setting: scopeUuid null.",
+      "scope": "global",
+      "scopeUuid": null,
+      "key": "scanIntervalSeconds",
+      "value": 300
+    },
+    {
+      "scope": "global",
+      "scopeUuid": null,
+      "key": "maxMissedPushes",
+      "value": 3
+    },
+    {
+      "_note": "Group setting, inherited by the group's sub-groups and sites.",
+      "scope": "group",
+      "scopeUuid": "aaaaaaaa-0000-4000-8000-000000000001",
+      "key": "businessHours",
+      "value": {
+        "tz": "Europe/Paris",
+        "days": {
+          "mon": [["08:00", "18:00"]],
+          "tue": [["08:00", "18:00"]],
+          "wed": [["08:00", "18:00"]],
+          "thu": [["08:00", "18:00"]],
+          "fri": [["08:00", "17:00"]]
+        },
+        "closedDates": ["2099-12-25"]
+      }
+    },
+    {
+      "scope": "group",
+      "scopeUuid": "aaaaaaaa-0000-4000-8000-000000000002",
+      "key": "notifyDeviceOnline",
+      "value": false
+    },
+    {
+      "_note": "Site settings: JSON lists of IPv4 CIDRs / ports.",
+      "scope": "site",
+      "scopeUuid": "bbbbbbbb-0000-4000-8000-000000000001",
+      "key": "excludedSubnets",
+      "value": ["192.0.2.0/24"]
+    },
+    {
+      "scope": "site",
+      "scopeUuid": "bbbbbbbb-0000-4000-8000-000000000001",
+      "key": "scanIntervalSeconds",
+      "value": 600
+    },
+    {
+      "scope": "site",
+      "scopeUuid": "bbbbbbbb-0000-4000-8000-000000000002",
+      "key": "portScanPorts",
+      "value": [22, 80, 443]
+    }
+  ],
+
+  "notificationChannels": [
+    {
+      "_note": "Generic webhook. Secrets may be left out (or set to \"__REDACTED__\"); a channel whose secret cannot be restored is imported disabled. Bindings attach the channel globally or to a group / site.",
+      "uuid": "cccccccc-0000-4000-8000-000000000001",
+      "name": "Example Webhook",
+      "type": "webhook",
+      "config": {
+        "url": "https://webhook.example.com/oblimap"
+      },
+      "isEnabled": false,
+      "bindings": [
+        { "scope": "global", "scopeUuid": null, "overrideMode": "merge" },
+        { "scope": "site", "scopeUuid": "bbbbbbbb-0000-4000-8000-000000000002", "overrideMode": "replace" }
+      ]
+    }
+  ],
+
+  "teams": [
+    {
+      "_note": "Teams and their permissions (ro = read, rw = read / write) on groups or sites. Memberships are never imported.",
+      "uuid": "dddddddd-0000-4000-8000-000000000001",
+      "name": "Example Network Team",
+      "description": "Example team",
+      "canCreate": false,
+      "permissions": [
+        { "scope": "group", "scopeUuid": "aaaaaaaa-0000-4000-8000-000000000001", "level": "ro" },
+        { "scope": "site", "scopeUuid": "bbbbbbbb-0000-4000-8000-000000000002", "level": "rw" }
+      ]
+    }
+  ],
+
+  "siteSubnets": [
+    {
+      "_note": "Named subnets of a site (siteUuid). Prefix /16 to /30; the gateway, when set, must be inside the subnet. Keyed by site + CIDR.",
+      "siteUuid": "bbbbbbbb-0000-4000-8000-000000000001",
+      "cidr": "192.0.2.0/24",
+      "name": "Example office LAN",
+      "vlan": 10,
+      "gateway": "192.0.2.1",
+      "description": "Example subnet"
+    }
+  ],
+
+  "reservations": [
+    {
+      "_note": "IP reservations, keyed by site + IP. reservedMac (optional) is the device the IP is reserved for: that device holding the IP is no conflict.",
+      "siteUuid": "bbbbbbbb-0000-4000-8000-000000000001",
+      "ip": "192.0.2.10",
+      "name": "Example printer",
+      "description": "Reserved for the example printer",
+      "deviceType": "printer",
+      "reservedMac": "02:00:00:00:00:10"
+    },
+    {
+      "siteUuid": "bbbbbbbb-0000-4000-8000-000000000001",
+      "ip": "192.0.2.20",
+      "name": "Example spare address",
+      "description": null,
+      "deviceType": null,
+      "reservedMac": null
+    }
+  ],
+
+  "siteItems": [
+    {
+      "_note": "A manual device (isManual true): created when no device of the site has this MAC (or this IP when there is no MAC).",
+      "siteUuid": "bbbbbbbb-0000-4000-8000-000000000001",
+      "ip": "192.0.2.30",
+      "mac": "02:00:00:00:00:30",
+      "isManual": true,
+      "customName": "Example NAS",
+      "deviceType": "nas",
+      "notes": "Example notes",
+      "alertMode": "inherit"
+    },
+    {
+      "_note": "A discovered device (isManual false): never created by an import, only its name, notes, alert mode and (when not null) device type are applied to the device the probes found with this MAC.",
+      "siteUuid": "bbbbbbbb-0000-4000-8000-000000000002",
+      "ip": "198.51.100.5",
+      "mac": "02:00:00:00:01:05",
+      "isManual": false,
+      "customName": "Example camera",
+      "deviceType": null,
+      "notes": null,
+      "alertMode": "always"
+    }
+  ],
+
+  "vendorRules": [
+    {
+      "_note": "Vendor → device type rules (substring of the vendor name, case-insensitive). groupUuid null = the whole workspace. Importing them also needs the device checks capability.",
+      "groupUuid": null,
+      "vendorPattern": "Example Printers Inc",
+      "deviceType": "printer",
+      "label": null,
+      "priority": 0
+    },
+    {
+      "groupUuid": "aaaaaaaa-0000-4000-8000-000000000002",
+      "vendorPattern": "Example Cameras",
+      "deviceType": "camera",
+      "label": "Example camera",
+      "priority": 10
+    }
+  ],
+
+  "macVendorOverrides": [
+    {
+      "_note": "Platform administrators only: custom names of OUI prefixes of the IEEE table (shared by every workspace). Unknown prefixes are skipped.",
+      "prefix": "02:00:00",
+      "customName": "Example Vendor"
+    }
+  ],
+
+  "permissionSets": [
+    {
+      "_note": "Platform administrators only: custom permission sets (shared by every workspace), keyed by slug. The default sets are never changed by an import.",
+      "slug": "example-helpdesk",
+      "name": "Example helpdesk",
+      "capabilities": ["monitoring", "probes.read", "tunnels.use"]
+    }
+  ]
+}

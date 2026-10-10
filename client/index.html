@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" class="dark" data-theme="obli-operator">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Oblimap</title>
+    <!-- Obli design v1 fonts: Inter (body), Rajdhani (display ≥24px), JetBrains Mono (numerics). -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <!-- FOUC prevention: apply the saved theme before React boots so a light
+         theme doesn't flash the dark default (and vice-versa). Key = 'ov-theme'
+         (see client/src/utils/theme.ts). -->
+    <style>
+      [data-theme="obli-daylight"] body { background: #e5e9f0; }
+      [data-theme="obli-dim"] body { background: #2e3440; }
+    </style>
+    <script>
+      try {
+        var t = localStorage.getItem('ov-theme');
+        if (t === 'obli-operator' || t === 'obli-daylight' || t === 'obli-dim' || t === 'modern' || t === 'neon') {
+          document.documentElement.dataset.theme = t;
+        } else {
+          document.documentElement.dataset.theme = 'obli-operator';
+        }
+        // Only the dark themes get the `dark` class; keep it off for the light one.
+        document.documentElement.classList.toggle('dark', t !== 'obli-daylight');
+      } catch (e) {
+        document.documentElement.dataset.theme = 'obli-operator';
+      }
+    </script>
+  </head>
+  <body class="bg-bg-primary text-text-primary">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

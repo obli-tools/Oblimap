@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Oblimap Probe - Windows MSI Installer
+  Built with WiX v4+ on Windows.
+
+  Prerequisites (one-time setup):
+    dotnet tool install -g wix
+    go install (Go 1.22+, https://go.dev/dl)
+
+  Build (from probe/ directory):
+    the MSI build step of the release pipeline (wix build product.wxs)
+
+  Install command:
+    msiexec /i oblimap-probe.msi SERVERURL="https://..." APIKEY="your-key" /quiet
+-->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="Oblimap Probe"
+           Manufacturer="Oblimap"
+           Version="PROBE_VERSION_PLACEHOLDER"
+           Language="1033"
+           UpgradeCode="7F3A1B2C-9D4E-5678-BCDE-EF0123456780">
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of Oblimap Probe is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <!-- Properties passed via: msiexec /i ... SERVERURL="..." APIKEY="..." -->
+    <Property Id="SERVERURL" Secure="yes" />
+    <Property Id="APIKEY" Secure="yes" />
+
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="OblimapProbe">
+
+        <!--
+          The Go binary is a proper Windows service executable.
+          SERVERURL and APIKEY are passed as service arguments on first install;
+          the probe then writes config.json and reads it on subsequent starts.
+          DefaultVersion forces MSI to always overwrite the exe even when the
+          binary has no Win32 version resource (Go binaries are unversioned).
+        -->
+        <Component Id="ProbeExe" Guid="B2C3D4E5-F6A7-8901-BCDE-EF1234567801">
+          <File Id="ProbeExeFile" Source="dist\oblimap-probe.exe" Name="oblimap-probe.exe"
+                DefaultVersion="65535.0.0.0" />
+          <ServiceInstall Id="ProbeSvc"
+                          Name="OblimapProbe"
+                          DisplayName="Oblimap Network Probe"
+                          Description="Scans the local network and reports discovered devices to the Oblimap platform."
+                          Start="auto"
+                          Type="ownProcess"
+                          Account="LocalSystem"
+                          ErrorControl="normal"
+                          Arguments='--server "[SERVERURL]" --key "[APIKEY]"' />
+          <ServiceControl Id="ProbeSvcStart" Name="OblimapProbe" Start="install" />
+          <ServiceControl Id="ProbeSvcStop"  Name="OblimapProbe" Stop="both" Remove="uninstall" Wait="yes" />
+        </Component>
+
+        <!-- Registry fallback: probe reads these on first run if config.json is absent -->
+        <Component Id="ProbeConfig" Guid="C3D4E5F6-A7B8-9012-CDEF-F01234567802">
+          <RegistryValue Root="HKLM" Key="SOFTWARE\OblimapProbe"
+                         Name="ServerUrl" Type="string" Value="[SERVERURL]" KeyPath="yes" />
+          <RegistryValue Root="HKLM" Key="SOFTWARE\OblimapProbe"
+                         Name="ApiKey"    Type="string" Value="[APIKEY]" />
+        </Component>
+
+      </Directory>
+    </StandardDirectory>
+
+    <Feature Id="Main">
+      <ComponentRef Id="ProbeExe" />
+      <ComponentRef Id="ProbeConfig" />
+    </Feature>
+
+  </Package>
+</Wix>

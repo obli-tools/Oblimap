@@ -1,0 +1,181 @@
+node_modules/
+dist/
+!agent/dist/
+agent/dist/*.exe
+agent/bin/*.exe
+!desktop-app/dist/
+# Probe build outputs (probe/build-*.sh and the MSI build step): shipped through the
+# Docker build context (.dockerignore keeps probe/dist), never committed
+probe/*.exe
+probe/dist/
+.env
+*.log
+.DS_Store
+Thumbs.db
+coverage/
+.vscode/
+.idea/
+*.tsbuildinfo
+*.bat
+
+# Caches et données locales du poste
+.cache/
+
+# Local dev / planning notes
+PLAN.md
+custom/
+start.ps1
+
+# ── Hors build : JAMAIS sur GitHub ──
+# Rien de ce qui n est pas indispensable au build. La doc peut contenir des
+# données client : elle reste sur le poste.
+/docs/
+/docs-*/
+doc/
+*.md
+*.markdown
+*.txt
+# Nos scripts d outillage / notes
+*.bat
+*.cmd
+*.ps1
+*.psm1
+HANDOFF*
+NOTES*
+TODO*
+mockup-*.html
+/scripts/
+# Restes Obliview, liens locaux, binaires
+/agent/
+/obli.tools
+probe/probe.exe
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Durcissement : le dépôt publié = de quoi BUILDER,
+# rien d'autre. Tout ce qui suit reste sur le poste et n'est jamais publié.
+# Toute exception se déclare en négation explicite, APRÈS ce bloc, avec sa raison.
+# ══════════════════════════════════════════════════════════════════════════════
+
+# Fichiers et dossiers cachés du poste (caches, sessions d'outils, éditeurs,
+# brouillons, vérifications locales) : tous ignorés, sauf ceux du build.
+.*
+!.gitignore
+!.gitattributes
+!.dockerignore
+!.env.example
+!.gitkeep
+/AGENTS*
+/REPRISE*
+/HANDOFF*
+/NOTES*
+/TODO*
+/PLAN*
+*.jsonl
+
+# Documentation, notes, exports bureautiques (peuvent contenir des données client)
+docs/
+doc/
+docs-*/
+*.md
+!/README.md
+*.markdown
+*.txt
+*.pdf
+*.doc
+*.docx
+*.xls
+*.xlsx
+*.ppt
+*.pptx
+*.csv
+*.tsv
+*.har
+*.pcap
+*.pcapng
+
+# Scripts d'outillage du poste (build, release, déploiement, bench)
+*.bat
+*.cmd
+*.ps1
+*.psm1
+*.py
+__pycache__/
+
+# Journaux, sauvegardes, restes d'édition
+*.log
+/logs/
+*.bak
+*.orig
+*.rej
+*.pre-*
+*.swp
+*~
+*.tmp
+
+# Bases et dumps locaux
+*.sqlite
+*.sqlite3
+*.db
+*.dump
+*.sql.gz
+*.backup
+
+# Secrets, clés et certificats
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+*.cer
+*.der
+*.csr
+*.jks
+*.keystore
+*.pfx
+*.p12
+*.p8
+*.ppk
+*.kdbx
+*.secret
+*.credentials
+id_rsa*
+id_ed25519*
+id_ecdsa*
+*.mobileprovision
+
+# Tests et données de test : restent sur le poste (non nécessaires au build)
+*.test.*
+*.spec.*
+*_test.go
+*.verify.ts
+*.selftest.ts
+__tests__/
+testdata/
+fixtures/
+golden/
+*.golden
+*.sample
+*.export
+**/testing/
+/server/test/
+/server/tests/
+/client/test/
+/client/tests/
+
+# Binaires et sorties de build (produits sur le poste, jamais versionnés)
+*.exe
+*.msi
+*.dll
+*.syso
+*.wixpdb
+*.wixobj
+*.dmg
+*.pkg
+*.zip
+*.7z
+*.tar.gz
+*.tgz
+
+# Données d'instance locales
+custom/

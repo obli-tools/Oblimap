@@ -1,0 +1,86 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: oblimap
+      POSTGRES_USER: oblimap
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U oblimap"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+
+  server:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3002/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    # Every variable is documented in .env.example. The fallbacks keep an
+    # existing deployment starting unchanged; the insecure ones (DB password,
+    # session secret, admin password) are reported by the server at startup.
+    environment:
+      NODE_ENV: production
+      PORT: 3002
+      DATABASE_URL: postgres://oblimap:${DB_PASSWORD:-changeme}@postgres:5432/oblimap
+      SESSION_SECRET: ${SESSION_SECRET:-change-this-in-production}
+      SESSION_COOKIE_NAME: ${SESSION_COOKIE_NAME:-oblimap.sid}
+      SESSION_IDLE_TIMEOUT_HOURS: ${SESSION_IDLE_TIMEOUT_HOURS:-12}
+      CLIENT_ORIGIN: ${CLIENT_ORIGIN:-http://localhost}
+      # Public URL of this instance (password-reset links), e.g.
+      # https://oblimap.example.com; set FORCE_HTTPS=true once served over HTTPS.
+      APP_URL: ${APP_URL:-}
+      FORCE_HTTPS: ${FORCE_HTTPS:-false}
+      APP_NAME: ${APP_NAME:-Oblimap}
+      DEFAULT_ADMIN_USERNAME: ${DEFAULT_ADMIN_USERNAME:-admin}
+      DEFAULT_ADMIN_PASSWORD: ${DEFAULT_ADMIN_PASSWORD:-}
+      ALLOW_DEFAULT_ADMIN_PASSWORD: ${ALLOW_DEFAULT_ADMIN_PASSWORD:-false}
+      # Recovery switch: "true" ignores the "force 2FA" setting (see .env.example).
+      DISABLE_2FA_FORCE: ${DISABLE_2FA_FORCE:-false}
+      # Proxies whose X-Forwarded-For entries are believed (client IP for audit
+      # and IP-based trust). Default: loopback + this container's own networks
+      # + Docker's 172.16/12 pool. See .env.example.
+      TRUSTED_PROXIES: ${TRUSTED_PROXIES:-loopback, self, 172.16.0.0/12}
+      TRUSTED_PROXY_HOPS: ${TRUSTED_PROXY_HOPS:-2}
+      # Encryption at rest of stored secrets (base64 of 32 bytes), see .env.example.
+      DATA_ENCRYPTION_KEY: ${DATA_ENCRYPTION_KEY:-}
+      DATA_ENCRYPTION_KEY_ID: ${DATA_ENCRYPTION_KEY_ID:-k1}
+      ALLOW_PLAINTEXT_PROBE_SECRETS: ${ALLOW_PLAINTEXT_PROBE_SECRETS:-false}
+      SSRF_ALLOWLIST: ${SSRF_ALLOWLIST:-}
+      # Obligate SSO inbound secret (optional, empty = Settings value / today's behaviour) — see .env.example
+      OBLIGATE_INBOUND_SECRET: ${OBLIGATE_INBOUND_SECRET:-}
+      # Dedicated host name for the device web proxy (optional, empty = served on
+      # the Oblimap address in a sandbox) — see .env.example.
+      TUNNEL_ORIGIN: ${TUNNEL_ORIGIN:-}
+      PROBE_MAX_PENDING_PER_KEY: ${PROBE_MAX_PENDING_PER_KEY:-500}
+    volumes:
+      # Persistent custom directory: scripts, SSH keys, etc.
+      # SSH keys: chmod 700 custom/.ssh && chmod 600 custom/.ssh/id_*
+      - ${CUSTOM_DIR:-./custom}:/custom
+
+  client:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      server:
+        condition: service_healthy
+    ports:
+      - "${LISTEN_PORT:-3000}:80"
+
+volumes:
+  postgres_data:

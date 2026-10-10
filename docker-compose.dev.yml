@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  postgres:
+    # Loopback only: the dev database must not be reachable from the LAN.
+    ports:
+      - "127.0.0.1:5432:5432"
+
+  server:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+      target: builder
+    command: npx tsx watch src/index.ts
+    volumes:
+      - ./server/src:/app/server/src
+      - ./shared/src:/app/shared/src
+    environment:
+      NODE_ENV: development
+      PORT: 3002
+      DATABASE_URL: postgres://oblimap:${DB_PASSWORD:-changeme}@postgres:5432/oblimap
+      SESSION_SECRET: dev-secret
+      CLIENT_ORIGIN: http://localhost:5174
+      DEFAULT_ADMIN_USERNAME: admin
+      DEFAULT_ADMIN_PASSWORD: admin123
+
+  client:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+      target: builder
+    command: npx vite --host 0.0.0.0
+    volumes:
+      - ./client/src:/app/client/src
+      - ./shared/src:/app/shared/src
+    ports:
+      - "5174:5174"
+    environment:
+      VITE_API_URL: http://localhost:3002

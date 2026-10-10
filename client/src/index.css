@@ -1,0 +1,488 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Theme CSS custom properties
+   Values are space-separated RGB triplets so Tailwind's opacity modifier syntax
+   (e.g. bg-accent/30) works: Tailwind emits  rgb(var(--c-X) / 0.3)
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* Native controls (select popups, date pickers, scrollbars) follow the theme:
+   every theme is dark except Obli Daylight (utils/theme.ts toggles html.dark). */
+html.dark { color-scheme: dark; }
+[data-theme="obli-daylight"] { color-scheme: light; }
+select option { background-color: rgb(var(--c-bg-secondary)); color: rgb(var(--c-text-primary)); }
+
+/* ── Obli Operator (default) — Obli design system v1, teinte bleu nuit + accent vert Oblimap.
+       Tokens forwarded by Obligate (shared/src/themes.ts → OBLI_OPERATOR_THEME). ── */
+:root,
+[data-theme="obli-operator"] {
+  --c-bg-primary:            11 13 26;
+  --c-bg-secondary:          19 23 40;
+  --c-bg-tertiary:           24 28 48;
+  --c-bg-hover:              29 34 56;
+  --c-bg-active:             34 39 64;
+
+  /* Borders kept subtle on a dark base — Tailwind's `border-border` resolves
+     to `rgb(var(--c-border))` (no automatic alpha), so the value here MUST
+     be a near-bg shade rather than 255/255/255. */
+  --c-border:                42 48 72;
+  --c-border-light:          62 70 100;
+
+  --c-text-primary:          240 244 252;
+  --c-text-secondary:        180 188 215;
+  --c-text-muted:            130 140 175;
+
+  --c-status-up:             30 221 138;
+  --c-status-up-bg:          12 40 26;
+  --c-status-down:           107 115 153;
+  --c-status-down-bg:        24 28 48;
+  --c-status-pending:        79 123 255;
+  --c-status-pending-bg:     16 24 56;
+  --c-status-maintenance:    140 147 182;
+  --c-status-maintenance-bg: 19 23 40;
+  --c-status-paused:         75 82 115;
+  --c-status-paused-bg:      19 23 40;
+
+  /* Per-app accent — Oblimap green (perApp.oblimap). */
+  --c-accent:                30 221 138;
+  --c-accent-hover:          92 240 168;
+  --c-accent-dark:           20 165 105;
+  --c-primary:               30 221 138;
+
+  /* No borders on cards: depth via shadow + bg delta. */
+  --shadow-card: 0 1px 0 0 rgba(255,255,255,0.03), 0 6px 24px -8px rgba(0,0,0,0.45);
+  --shadow-glow: 0 0 0 1px rgb(var(--c-accent) / 0.18) inset, 0 6px 28px -10px rgb(var(--c-accent) / 0.25);
+}
+
+/* ── Modern UI (legacy) ───────────────────────────────────────────────────── */
+[data-theme="modern"] {
+  --c-bg-primary:            13 17 23;
+  --c-bg-secondary:          22 27 34;
+  --c-bg-tertiary:           28 35 51;
+  --c-bg-hover:              33 38 45;
+  --c-bg-active:             40 46 56;
+
+  --c-border:                48 54 61;
+  --c-border-light:          61 68 77;
+
+  --c-text-primary:          230 237 243;
+  --c-text-secondary:        139 148 158;
+  --c-text-muted:            110 118 129;
+
+  --c-status-up:             46 160 67;
+  --c-status-up-bg:          13 40 24;
+  --c-status-down:           248 81 73;
+  --c-status-down-bg:        61 20 24;
+  --c-status-pending:        210 153 34;
+  --c-status-pending-bg:     46 33 17;
+  --c-status-maintenance:    88 166 255;
+  --c-status-maintenance-bg: 13 37 70;
+  --c-status-paused:         139 148 158;
+  --c-status-paused-bg:      28 35 51;
+  --c-accent:                141 198 63;
+  --c-accent-hover:          161 213 93;
+  --c-accent-dark:           113 158 50;
+  --c-primary:               141 198 63;
+
+  --shadow-card: 0 1px 0 0 rgba(255,255,255,0.03), 0 6px 20px -8px rgba(1,4,9,0.55);
+  --shadow-glow: 0 0 0 1px rgb(var(--c-accent) / 0.18) inset, 0 6px 28px -10px rgb(var(--c-accent) / 0.25);
+}
+
+/* ── Neon UI — fonds neutres + accent vert Oblimap ───────────────────────── */
+[data-theme="neon"] {
+  --c-bg-primary:            7 8 10;
+  --c-bg-secondary:          13 14 17;
+  --c-bg-tertiary:           19 20 24;
+  --c-bg-hover:              27 27 32;
+  --c-bg-active:             36 36 42;
+
+  --c-border:                50 51 57;
+  --c-border-light:          65 66 73;
+
+  --c-text-primary:          240 234 226;
+  --c-text-secondary:        152 138 118;
+  --c-text-muted:            106 94 78;
+
+  --c-status-up:             0 195 95;
+  --c-status-up-bg:          0 26 16;
+  --c-status-down:           255 56 96;
+  --c-status-down-bg:        42 0 16;
+  --c-status-pending:        255 170 0;
+  --c-status-pending-bg:     32 21 0;
+  --c-status-maintenance:    0 200 255;
+  --c-status-maintenance-bg: 0 30 46;
+  --c-status-paused:         114 88 52;
+  --c-status-paused-bg:      20 13 6;
+  --c-accent:                141 198 63;
+  --c-accent-hover:          165 215 100;
+  --c-accent-dark:           113 158 50;
+  --c-primary:               141 198 63;
+
+  --shadow-card: 0 1px 0 0 rgba(255,255,255,0.025), 0 6px 22px -8px rgba(0,0,0,0.70);
+  --shadow-glow: 0 0 0 1px rgb(var(--c-accent) / 0.30) inset, 0 0 22px -6px rgb(var(--c-accent) / 0.35);
+}
+
+/* ── Obli Daylight — light companion to Obli Operator (Nordic Mist revision).
+       Nord "Snow Storm" blue-gray surface + Polar Night text, depth via soft
+       shadow (no borders), Inter/JetBrains Mono. Only surfaces change vs
+       Operator — the Oblimap green accent is kept identical to preserve brand
+       identity. Tokens forwarded by Obligate (shared/src/themes.ts → OBLI_DAYLIGHT_THEME).
+       Nordic Mist revision.
+
+       IMPORTANT: --c-bg-hover/-active and --c-border/-light MUST be plain RGB
+       triplets (no `R G B / A`). Tailwind always emits rgb(var(--x) / <alpha>),
+       so a stored alpha produces invalid CSS → dropped rule → thick black
+       borders app-wide. Use near-bg tones instead. ─────────────────────────── */
+[data-theme="obli-daylight"] {
+  --c-bg-primary:            229 233 240;   /* #e5e9f0 — Snow Storm page bg */
+  --c-bg-secondary:          236 239 244;   /* #eceff4 — cards */
+  --c-bg-tertiary:           216 222 233;   /* #d8dee9 — inputs / toolbar / pill container */
+  --c-bg-hover:              222 227 236;   /* plain RGB — see note above */
+  --c-bg-active:             210 217 229;
+
+  --c-border:                212 220 231;
+  --c-border-light:          224 230 240;
+
+  --c-text-primary:          46 52 64;       /* #2e3440 — Polar Night */
+  --c-text-secondary:        76 86 106;      /* #4c566a */
+  --c-text-muted:            129 141 161;    /* #818da1 */
+
+  --c-status-up:             16 163 96;
+  --c-status-up-bg:          220 252 231;
+  --c-status-down:           148 163 184;
+  --c-status-down-bg:        216 222 233;
+  --c-status-pending:        37 99 235;
+  --c-status-pending-bg:     219 234 254;
+  --c-status-maintenance:    100 116 139;
+  --c-status-maintenance-bg: 216 222 233;
+  --c-status-paused:         148 163 184;
+  --c-status-paused-bg:      216 222 233;
+  --c-status-warning:        217 119 6;
+  --c-status-critical:       220 38 38;
+
+  /* Accent kept identical to Obli Operator (Oblimap green) — Daylight retunes
+     surfaces only, not brand identity. */
+  --c-accent:                30 221 138;
+  --c-accent-hover:          92 240 168;
+  --c-accent-dark:           20 165 105;
+  --c-primary:               30 221 138;
+
+  --shadow-card: 0 1px 2px 0 rgba(46,52,64,0.03), 0 6px 24px -12px rgba(46,52,64,0.08);
+  --shadow-glow: 0 0 0 1px rgb(var(--c-accent) / 0.18) inset, 0 8px 32px -12px rgb(var(--c-accent) / 0.22);
+}
+
+[data-theme="obli-daylight"] body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #e5e9f0;
+}
+
+/* ── Obli Dim ─────────────────────────────────────────────────────────────────
+   Dark companion of Obli Daylight: Nord "Polar Night" neutrals (mid-dark slate,
+   softer than Operator's near-black) so a second server can be told apart at a
+   glance without switching to a light theme. It is a DARK theme for every
+   light/dark decision (logo, `dark` class, native controls via color-scheme).
+   Dim changes NEUTRALS ONLY: the accent block below is copied verbatim from
+   Obli Operator (Oblimap green) and must never diverge from it.
+   Status semantics follow Operator / Daylight: `down` is the neutral grey
+   (offline device, "x/y online" badges), `pending` is the info blue; `warning`
+   and `critical` mirror Daylight's extra tokens.
+   Same rule as Daylight: every token is a plain RGB triplet (no alpha).
+   ───────────────────────────────────────────────────────────────────────────── */
+[data-theme="obli-dim"] {
+  color-scheme: dark;
+
+  --c-bg-primary:            46 52 64;      /* #2e3440  page */
+  --c-bg-secondary:          59 66 82;      /* #3b4252  cards / surfaces */
+  --c-bg-tertiary:           67 76 94;      /* #434c5e  inputs / pill containers */
+  --c-bg-hover:              70 80 99;      /* #465063  hover, one step above tertiary */
+  --c-bg-active:             74 84 104;     /* #4a5468  active / selected */
+
+  --c-border:                76 86 106;     /* #4c566a */
+  --c-border-light:          94 106 130;    /* #5e6a82 */
+
+  --c-text-primary:          236 239 244;   /* #eceff4 */
+  --c-text-secondary:        216 222 233;   /* #d8dee9 */
+  --c-text-muted:            163 171 188;   /* #a3abbc */
+
+  --c-status-up:             108 203 143;   /* #6ccb8f */
+  --c-status-up-bg:          47 74 61;      /* #2f4a3d */
+  --c-status-down:           138 147 166;   /* #8a93a6  neutral, as in Operator */
+  --c-status-down-bg:        54 60 74;      /* #363c4a */
+  --c-status-pending:        136 166 224;   /* #88a6e0  info blue */
+  --c-status-pending-bg:     53 66 94;      /* #35425e */
+  --c-status-maintenance:    138 147 166;   /* #8a93a6  neutral, as in Operator */
+  --c-status-maintenance-bg: 54 60 74;      /* #363c4a */
+  --c-status-paused:         138 147 166;   /* #8a93a6 */
+  --c-status-paused-bg:      54 60 74;      /* #363c4a */
+  --c-status-warning:        235 203 139;   /* #ebcb8b */
+  --c-status-critical:       255 107 107;   /* #ff6b6b */
+
+  /* Accent — VERBATIM from Obli Operator (Oblimap green #1edd8a). */
+  --c-accent:                30 221 138;
+  --c-accent-hover:          92 240 168;
+  --c-accent-dark:           20 165 105;
+  --c-primary:               30 221 138;
+
+  --shadow-card: 0 1px 0 0 rgba(255,255,255,0.03), 0 6px 20px -8px rgba(20,23,30,0.40);
+  --shadow-glow: 0 0 0 1px rgb(var(--c-accent) / 0.20) inset, 0 6px 26px -10px rgb(var(--c-accent) / 0.28);
+}
+
+/* Obli Dim chrome: topbar (<header>, layout/Header.tsx) + sidebar (<aside>,
+   layout/Sidebar.tsx, both widths) use bg-bg-secondary (the card token); here
+   they sit one step DARKER than the page (#282d37) so the L-shaped chrome frames
+   the slate content. The only other <aside> (DeviceChecksDrawer) is
+   bg-bg-primary and is not matched. */
+[data-theme="obli-dim"] header.bg-bg-secondary,
+[data-theme="obli-dim"] aside.bg-bg-secondary {
+  background-color: rgb(40 45 55);          /* #282d37 */
+}
+
+/* Obli Dim filled danger button (Button.tsx: bg-status-down + text-white):
+   white on the #8a93a6 down slate is only 3.1:1, so the fill takes Operator's
+   own danger slate #6b7399 (white 4.6:1, same button as Operator). Text and
+   tint uses of status-down are unchanged; hover:bg-red-700 still applies. */
+[data-theme="obli-dim"] .bg-status-down.text-white:not(:hover) {
+  background-color: rgb(107 115 153);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Utility — hide scrollbar (used by PeekedGrid)
+   ───────────────────────────────────────────────────────────────────────────── */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Base styles
+   (No legacy background / button aliases: use the bg-bg-* tokens, cards as
+   `rounded-xl bg-bg-secondary shadow-[var(--shadow-card)]`, and <Button>.)
+   ───────────────────────────────────────────────────────────────────────────── */
+@layer base {
+  body {
+    @apply bg-bg-primary text-text-primary antialiased;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-bg-primary;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-border rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-border-light;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Neon UI — glow effects
+   All selectors are flat (not nested) for PostCSS compatibility.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* ── Header bottom accent line ──────────────────────────────────────────────── */
+[data-theme="neon"] header {
+  position: relative;
+  border-bottom-color: transparent;
+}
+[data-theme="neon"] header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: radial-gradient(
+    ellipse 70% 100% at 50% 100%,
+    rgb(var(--c-accent) / 0.9) 0%,
+    rgb(var(--c-accent) / 0.4) 40%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+/* ── Active nav item — cyan flash ───────────────────────────────────────────── */
+[data-theme="neon"] .bg-bg-active {
+  background-color: rgb(var(--c-accent) / 0.1) !important;
+  box-shadow: inset 3px 0 0 rgb(var(--c-accent) / 1);
+}
+[data-theme="neon"] .bg-bg-active .text-text-primary {
+  color: rgb(var(--c-accent) / 1) !important;
+  text-shadow: 0 0 10px rgb(var(--c-accent) / 0.65);
+}
+[data-theme="neon"] .bg-bg-active svg {
+  color: rgb(var(--c-accent) / 1) !important;
+  filter: drop-shadow(0 0 4px rgb(var(--c-accent) / 0.7));
+}
+
+/* ── Accent & primary text glow ─────────────────────────────────────────────── */
+[data-theme="neon"] .text-accent {
+  text-shadow: 0 0 12px rgb(var(--c-accent) / 0.5);
+}
+[data-theme="neon"] .text-primary {
+  text-shadow: 0 0 12px rgb(var(--c-accent) / 0.5);
+}
+
+/* ── Status text glows ──────────────────────────────────────────────────────── */
+[data-theme="neon"] .text-status-up {
+  text-shadow: 0 0 10px rgb(var(--c-status-up) / 0.6);
+}
+[data-theme="neon"] .text-status-down {
+  text-shadow: 0 0 10px rgb(var(--c-status-down) / 0.5);
+}
+
+/* ── Card status borders + glows — driven by [data-status] attribute ────────── */
+/* "up" = clean green border only — no outer glow (most cards are up, avoid fog effect) */
+[data-theme="neon"] [data-status="up"] {
+  border-color: rgb(0 195 95 / 0.45) !important;
+}
+/* Problem states: tight neon glow so they stand out clearly */
+[data-theme="neon"] [data-status="down"] {
+  border-color: rgb(255 56 96 / 0.75) !important;
+  box-shadow: 0 0 8px rgb(255 56 96 / 0.4);
+}
+[data-theme="neon"] [data-status="alert"] {
+  border-color: rgb(255 120 50 / 0.75) !important;
+  box-shadow: 0 0 8px rgb(255 120 50 / 0.35);
+}
+[data-theme="neon"] [data-status="pending"] {
+  border-color: rgb(255 170 0 / 0.55) !important;
+}
+[data-theme="neon"] [data-status="maintenance"] {
+  border-color: rgb(0 200 255 / 0.5) !important;
+}
+
+/* ── Accent border / ring glow ──────────────────────────────────────────────── */
+[data-theme="neon"] .border-accent {
+  box-shadow: 0 0 0 1px rgb(var(--c-accent) / 0.4), 0 0 12px rgb(var(--c-accent) / 0.2);
+}
+[data-theme="neon"] .ring-accent {
+  box-shadow: 0 0 0 1px rgb(var(--c-accent) / 0.4), 0 0 12px rgb(var(--c-accent) / 0.2);
+}
+
+/* ── Primary button glow ────────────────────────────────────────────────────── */
+[data-theme="neon"] button.bg-accent {
+  box-shadow: 0 0 14px rgb(var(--c-accent) / 0.4), 0 2px 8px rgb(0 0 0 / 0.4);
+}
+[data-theme="neon"] a.bg-accent {
+  box-shadow: 0 0 14px rgb(var(--c-accent) / 0.4), 0 2px 8px rgb(0 0 0 / 0.4);
+}
+
+/* ── Status badge / dot glow ─────────────────────────────────────────────────── */
+[data-theme="neon"] .bg-status-up {
+  box-shadow: 0 0 8px rgb(var(--c-status-up) / 0.65);
+}
+[data-theme="neon"] .bg-status-down {
+  box-shadow: 0 0 8px rgb(var(--c-status-down) / 0.6);
+}
+
+/* ── Card secondary bg border ───────────────────────────────────────────────── */
+[data-theme="neon"] .bg-bg-secondary {
+  border-color: rgb(var(--c-border) / 1);
+}
+
+/* ── IPAM status borders ─────────────────────────────────────────────────── */
+/* online = green */
+[data-theme="neon"] [data-status="online"] {
+  border-color: rgb(0 195 95 / 0.45) !important;
+}
+/* offline = red glow */
+[data-theme="neon"] [data-status="offline"] {
+  border-color: rgb(255 56 96 / 0.75) !important;
+  box-shadow: 0 0 8px rgb(255 56 96 / 0.4);
+}
+/* reserved = emerald */
+[data-theme="neon"] [data-status="reserved"] {
+  border-color: rgb(var(--c-accent) / 0.6) !important;
+  box-shadow: 0 0 7px rgb(var(--c-accent) / 0.3);
+}
+/* conflict = orange */
+[data-theme="neon"] [data-status="conflict"] {
+  border-color: rgb(255 120 50 / 0.75) !important;
+  box-shadow: 0 0 8px rgb(255 120 50 / 0.35);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Mobile / touch foundation (ported from Obliance index.css)
+   Everything below is either a CSS variable, an opt-in utility class, or is
+   scoped to touch / small-screen media queries: desktop rendering is unchanged.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* Safe-area insets (notch, gesture bar). Non-zero only when the viewport meta
+   has viewport-fit=cover on a device that has insets.
+   Use them as `pt-[var(--safe-top)]` or through the .p*-safe utilities. */
+:root {
+  --safe-top:    env(safe-area-inset-top, 0px);
+  --safe-right:  env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left:   env(safe-area-inset-left, 0px);
+}
+
+@layer base {
+  html {
+    /* No grey flash on tap (mobile browsers / WebView only). */
+    -webkit-tap-highlight-color: transparent;
+    /* Stop mobile browsers from inflating font sizes in landscape. */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  html,
+  body {
+    /* No pull-to-refresh / scroll chaining out of the app shell. */
+    overscroll-behavior-y: contain;
+  }
+}
+
+/* Phones with a touch screen: 16px form fields (prevents focus-zoom on
+   WebKit and keeps text readable). !important is required because the
+   text-xs / text-sm utilities on the fields would otherwise win.
+   Opt out with the `keep-font-size` class (e.g. dense code editors). */
+@media (pointer: coarse) and (max-width: 767px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):not(.keep-font-size),
+  select:not(.keep-font-size),
+  textarea:not(.keep-font-size) {
+    font-size: 16px !important;
+  }
+}
+
+@layer utilities {
+  /* Safe-area padding helpers (work with variants: `sm:pb-safe`, ...). */
+  .pt-safe { padding-top: var(--safe-top); }
+  .pr-safe { padding-right: var(--safe-right); }
+  .pb-safe { padding-bottom: var(--safe-bottom); }
+  .pl-safe { padding-left: var(--safe-left); }
+  .px-safe { padding-left: var(--safe-left); padding-right: var(--safe-right); }
+  .py-safe { padding-top: var(--safe-top); padding-bottom: var(--safe-bottom); }
+
+  /* Surfaces that take raw pointer input (starmap canvas, drawing): no
+     browser pan/zoom, no text selection, no long-press callout. */
+  .touch-none-canvas {
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+}
+
+/* TableScroll `stickyFirstCol` — the first cell of every row stays visible
+   while the table scrolls horizontally. Background is overridable per table
+   with the --table-sticky-bg custom property (defaults to the card colour). */
+.table-sticky-first tr > :first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background-color: var(--table-sticky-bg, rgb(var(--c-bg-secondary)));
+}

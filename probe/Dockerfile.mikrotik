@@ -1,0 +1,29 @@
+# syntax=docker/dockerfile:1
+# Oblimap probe — container image for MikroTik RouterOS v7 (also any Docker host).
+#
+# Built by build-container.sh from the binaries of build-linux.sh
+# (dist/oblimap-probe-linux-{amd64,arm64,arm}). Platforms: linux/amd64 (CHR,
+# x86), linux/arm64 (hAP ax, Chateau ax, RB5009, CCR2xxx), linux/arm/v7.
+# No RUN step: cross-platform builds need no emulation (alpine already ships
+# the CA bundle).
+#
+# Configuration (container envs, read by the probe itself):
+#   OBLIMAP_SERVER               Oblimap URL, e.g. https://oblimap.example.com
+#   OBLIMAP_KEY                  probe API key (kept in config.json after the first start)
+#   OBLIMAP_ROUTEROS_URL         the router as seen from the container, e.g. https://172.17.0.1
+#   OBLIMAP_ROUTEROS_USER        read-only RouterOS user (policy read + rest-api)
+#   OBLIMAP_ROUTEROS_PASSWORD
+#   OBLIMAP_ROUTEROS_INSECURE    1 = accept the router's self-signed certificate
+#
+# Mount /etc/oblimap-probe to keep the probe identity (config.json, token)
+# across container re-creations.
+
+FROM alpine:3.20
+
+ARG TARGETARCH
+
+COPY --chmod=755 dist/oblimap-probe-linux-${TARGETARCH} /usr/local/bin/oblimap-probe
+
+VOLUME ["/etc/oblimap-probe"]
+
+ENTRYPOINT ["/usr/local/bin/oblimap-probe"]
